@@ -1013,6 +1013,146 @@
     .fc-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
     .fc-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
 
+    /* ═══════════════ URL DOWNLOADER ═══════════════ */
+    .url-panel {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 24px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .url-panel-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .url-panel-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .url-platforms {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .plat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .plat-chip:hover { border-color: var(--accent); color: var(--accent2); }
+    .url-input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .url-input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .url-input:focus { border-color: var(--accent); }
+    .url-input::placeholder { color: var(--text3); }
+    .url-fmt-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .url-fmt-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text2);
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .url-fmt-btn.active { background: rgba(124,58,237,0.15); border-color: var(--accent); color: var(--accent2); }
+    .url-fmt-btn:hover { border-color: var(--border2); }
+    .btn-url-fetch {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .btn-url-fetch:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-url-fetch:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .url-notice {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(255,170,0,0.06);
+      border: 1px solid rgba(255,170,0,0.2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--warning);
+      line-height: 1.6;
+    }
+    .url-status {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(124,58,237,0.08);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--accent2);
+      display: none;
+    }
+
+    /* ═══════════════ AD BANNER ═══════════════ */
+    .ad-banner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .ad-banner-inner {
+      background: var(--surface);
+      border: 1px dashed var(--border2);
+      border-radius: var(--radius);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 90px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ad-label {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      font-size: 9px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text3);
+      letter-spacing: 0.08em;
+    }
+
     /* ═══════════════ FOOTER ═══════════════ */
     footer {
       border-top: 1px solid var(--border);
@@ -1320,6 +1460,55 @@
 
     </aside>
   </main>
+
+  <!-- AD BANNER (après main) -->
+  <div class="ad-banner">
+    <div class="ad-banner-inner">
+      <span class="ad-label">Publicité</span>
+      <!-- ═══ REMPLACEZ CE BLOC PAR VOTRE SCRIPT PUBLICITAIRE ═══ -->
+      <!-- Exemple Adsterra / PopAds / HilltopAds banner 728x90   -->
+      <!-- <script async src="https://votre-reseau.com/banner.js"></script> -->
+      <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text3);">[ Espace publicitaire 728×90 — Insérez votre script ici ]</span>
+    </div>
+  </div>
+
+  <!-- URL DOWNLOADER -->
+  <div class="url-panel">
+    <div class="url-panel-inner">
+      <div class="url-panel-title">
+        🔗 Télécharger depuis une URL
+      </div>
+      <div class="url-platforms">
+        <span class="plat-chip" onclick="pasteExample('youtube')">▶️ YouTube</span>
+        <span class="plat-chip" onclick="pasteExample('tiktok')">🎵 TikTok</span>
+        <span class="plat-chip" onclick="pasteExample('instagram')">📸 Instagram</span>
+        <span class="plat-chip" onclick="pasteExample('twitter')">🐦 X / Twitter</span>
+        <span class="plat-chip" onclick="pasteExample('facebook')">📘 Facebook</span>
+        <span class="plat-chip" onclick="pasteExample('vimeo')">🎬 Vimeo</span>
+        <span class="plat-chip" onclick="pasteExample('dailymotion')">📺 Dailymotion</span>
+        <span class="plat-chip" onclick="pasteExample('twitch')">💜 Twitch</span>
+      </div>
+      <div class="url-input-row">
+        <input type="url" class="url-input" id="urlInput"
+          placeholder="https://www.youtube.com/watch?v=... ou TikTok, Instagram, Twitter..."
+          oninput="onUrlInput()" />
+        <button class="btn-url-fetch" id="urlFetchBtn" onclick="handleUrlDownload()" disabled>
+          ⬇️ Télécharger
+        </button>
+      </div>
+      <div class="url-fmt-row">
+        <span style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:4px;">Format :</span>
+        <button class="url-fmt-btn active" id="urlFmtMp3" onclick="setUrlFmt('mp3')">🎵 MP3</button>
+        <button class="url-fmt-btn" id="urlFmtMp4" onclick="setUrlFmt('mp4')">🎬 MP4</button>
+      </div>
+      <div class="url-status" id="urlStatus">⏳ Analyse de l'URL en cours…</div>
+      <div class="url-notice">
+        ⚠️ <strong>Note :</strong> Le téléchargement depuis YouTube, TikTok, etc. nécessite un serveur backend (ex : <strong>yt-dlp</strong>).
+        Cette interface envoie la requête à <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;">/api/download?url=…&format=mp3</code>.
+        Déployez <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" style="color:var(--accent2);">yt-dlp</a> ou une API compatible sur votre serveur Vercel/VPS et pointez <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;">API_BASE</code> dans le script.
+      </div>
+    </div>
+  </div>
 
   <!-- HISTORY -->
   <section class="history-panel" aria-label="Historique des conversions">
@@ -2049,5 +2238,131 @@ document.addEventListener('dragenter', e => e.preventDefault());
 document.addEventListener('dragover', e => e.preventDefault());
 </script>
 
-</body>
+<!-- ═══════════════════════════════════════════════════
+     URL DOWNLOADER — yt-dlp API client
+═══════════════════════════════════════════════════ -->
+<script>
+// Pointez cette variable vers votre backend yt-dlp
+// Ex: 'https://votre-api.vercel.app' ou 'http://localhost:3001'
+const API_BASE = '/api';
+
+let urlSelectedFmt = 'mp3';
+
+function pasteExample(platform) {
+  const examples = {
+    youtube:     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    tiktok:      'https://www.tiktok.com/@user/video/1234567890',
+    instagram:   'https://www.instagram.com/reel/ABC123/',
+    twitter:     'https://twitter.com/user/status/1234567890',
+    facebook:    'https://www.facebook.com/watch/?v=1234567890',
+    vimeo:       'https://vimeo.com/123456789',
+    dailymotion: 'https://www.dailymotion.com/video/x1234ab',
+    twitch:      'https://www.twitch.tv/videos/1234567890',
+  };
+  const input = document.getElementById('urlInput');
+  input.value = examples[platform] || '';
+  input.focus();
+  onUrlInput();
+}
+
+function onUrlInput() {
+  const val = document.getElementById('urlInput').value.trim();
+  document.getElementById('urlFetchBtn').disabled = !val || !val.startsWith('http');
+}
+
+function setUrlFmt(fmt) {
+  urlSelectedFmt = fmt;
+  document.getElementById('urlFmtMp3').classList.toggle('active', fmt === 'mp3');
+  document.getElementById('urlFmtMp4').classList.toggle('active', fmt === 'mp4');
+}
+
+async function handleUrlDownload() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+
+  const statusEl = document.getElementById('urlStatus');
+  const fetchBtn = document.getElementById('urlFetchBtn');
+
+  statusEl.style.display = 'block';
+  statusEl.textContent = '⏳ Analyse de l\'URL en cours…';
+  fetchBtn.disabled = true;
+
+  try {
+    // Déclenche le popunder au moment du clic (1 fois par session)
+    triggerPopunder();
+
+    const apiUrl = `${API_BASE}/download?url=${encodeURIComponent(url)}&format=${urlSelectedFmt}`;
+    statusEl.textContent = '⬇️ Téléchargement en cours… (peut prendre 10–30s)';
+
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Erreur serveur' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+
+    // Téléchargement du fichier renvoyé par l'API
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get('Content-Disposition') || '';
+    let filename = contentDisposition.match(/filename="?([^"]+)"?/)?.[1]
+      || `download.${urlSelectedFmt}`;
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    statusEl.style.background = 'rgba(34,197,94,0.08)';
+    statusEl.style.borderColor = 'rgba(34,197,94,0.2)';
+    statusEl.style.color = 'var(--success)';
+    statusEl.textContent = `✅ Téléchargé : ${filename}`;
+
+    showToast('success', '✅ Téléchargement terminé', filename);
+
+    // Ajoute à l'historique
+    addToHistory(url.slice(0, 60) + '…', filename, urlSelectedFmt, blob.size);
+
+  } catch (err) {
+    statusEl.style.background = 'rgba(255,68,68,0.08)';
+    statusEl.style.borderColor = 'rgba(255,68,68,0.2)';
+    statusEl.style.color = 'var(--danger)';
+    statusEl.textContent = `❌ Erreur : ${err.message}. Vérifiez que le backend yt-dlp est déployé.`;
+    showToast('error', '❌ Erreur téléchargement', err.message);
+  } finally {
+    fetchBtn.disabled = false;
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     POPUNDER — Déclenché sur premier clic utilisateur
+     Remplacez l'URL par celle de votre réseau (Popads,
+     Adsterra, HilltopAds, etc.)
+═══════════════════════════════════════════════════ -->
+<script>
+let popunderShown = false;
+
+function triggerPopunder() {
+  if (popunderShown) return;
+  popunderShown = true;
+  // ═══ REMPLACEZ CETTE URL PAR CELLE DE VOTRE RÉSEAU PUBLICITAIRE ═══
+  const popUrl = 'https://www.votre-reseau-pub.com/popunder?id=VOTRE_ID';
+  try {
+    const w = window.open('about:blank', '_blank');
+    if (w) {
+      w.blur();
+      window.focus();
+      setTimeout(() => { try { w.location.href = popUrl; } catch(e){} }, 100);
+    }
+  } catch(e) {}
+}
+
+// Déclenche aussi sur le premier clic n'importe où sur la page
+document.addEventListener('click', function onFirstClick() {
+  triggerPopunder();
+  document.removeEventListener('click', onFirstClick);
+}, { once: true });
+</script>
+
 </html>
