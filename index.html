@@ -52,9 +52,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
 
-  <!-- FFmpeg WASM CDN -->
-  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js"></script>
-  <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+  <!-- FFmpeg WASM — jsDelivr (envoie Cross-Origin-Resource-Policy: cross-origin) -->
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js" crossorigin="anonymous"></script>
 
   <style>
     /* ═══════════════════════════════════════════
@@ -1507,8 +1507,6 @@
         Cette interface envoie la requête à <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;">/api/download?url=…&format=mp3</code>.
         Déployez <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" style="color:var(--accent2);">yt-dlp</a> ou une API compatible sur votre serveur Vercel/VPS et pointez <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;">API_BASE</code> dans le script.
       </div>
-      <script src="https://pl29460121.effectivecpmnetwork.com/51/b4/37/51b437697576a4b350bcac7d87ecd45b.js"></script>
-
     </div>
   </div>
 
@@ -1654,10 +1652,13 @@ async function initFFmpeg() {
 
     loadingStatus.textContent = 'Téléchargement du moteur FFmpeg (~30MB)...';
 
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/umd';
+    // toBlobURL télécharge le fichier et crée une URL blob locale,
+    // ce qui contourne le blocage COEP (require-corp) sur les ressources cross-origin
+    const { toBlobURL } = FFmpegUtil;
+    const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.4/dist/umd';
     await ffmpeg.load({
-      coreURL: `${baseURL}/ffmpeg-core.js`,
-      wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+      coreURL:   await toBlobURL(`${baseURL}/ffmpeg-core.js`,   'text/javascript'),
+      wasmURL:   await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
     });
 
     ffmpegInstance = ffmpeg;
