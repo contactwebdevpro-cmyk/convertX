@@ -6,6 +6,7 @@
 <title>MediaDrop — Convertisseur Local</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -944,57 +945,45 @@
   </div>
 </div>
 
-<script>
-// ─── FFMPEG SETUP ─────────────────────────────────────────────────────────────
+// ─── FFMPEG 0.11 (single-thread, no SharedArrayBuffer, no worker) ─────────────
 let ffmpeg = null;
 let currentFile = null;
 let outputUrl = null;
-const FFMPEG_VERSION = '0.12.6';
 
 async function initFFmpeg() {
   const bar = document.getElementById('init-bar');
   const status = document.getElementById('init-status');
-
   try {
-    bar.style.width = '20%';
+    bar.style.width = '30%';
     status.textContent = 'Chargement de ffmpeg.wasm…';
 
-    // Load ffmpeg from CDN (jsdelivr — CORS headers corrects)
-    const { FFmpeg } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js');
-    const { fetchFile, toBlobURL } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');
-
+    const { createFFmpeg, fetchFile } = FFmpeg;
     window._fetchFile = fetchFile;
-    bar.style.width = '50%';
-    status.textContent = 'Initialisation du moteur…';
 
-    ffmpeg = new FFmpeg();
-
-    ffmpeg.on('log', ({ message }) => {
-      addLog(message);
-      const timeMatch = message.match(/time=(\d+):(\d+):(\d+\.\d+)/);
-      if (timeMatch && window._totalDuration) {
-        const secs = parseInt(timeMatch[1])*3600 + parseInt(timeMatch[2])*60 + parseFloat(timeMatch[3]);
-        const pct = Math.min(95, Math.round((secs / window._totalDuration) * 100));
-        setProgress(pct);
-      }
+    ffmpeg = createFFmpeg({
+      corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
+      log: true,
+      logger: ({ message }) => {
+        addLog(message);
+        const m = message.match(/time=(\d+):(\d+):(\d+\.\d+)/);
+        if (m && window._totalDuration) {
+          const s = parseInt(m[1])*3600 + parseInt(m[2])*60 + parseFloat(m[3]);
+          setProgress(Math.min(95, Math.round((s / window._totalDuration) * 100)));
+        }
+      },
+      progress: ({ ratio }) => {
+        if (ratio > 0) setProgress(Math.min(95, Math.round(ratio * 100)));
+      },
     });
 
-    const baseURL = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm`;
-    const workerURL = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/esm/worker.js`;
-    bar.style.width = '70%';
+    bar.style.width = '60%';
     status.textContent = 'Téléchargement du core wasm…';
-
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      workerURL: await toBlobURL(workerURL, 'text/javascript'),
-    });
+    await ffmpeg.load();
 
     bar.style.width = '100%';
     status.textContent = 'Prêt !';
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 400));
     document.getElementById('init-overlay').classList.add('hide');
-
   } catch(e) {
     status.textContent = 'Erreur : ' + e.message;
     bar.style.background = '#ff4d6d';
@@ -1124,59 +1113,42 @@ async function startConversion() {
   document.getElementById('btn-convert').disabled = true;
 
   try {
-    // Write input file
     const inName = 'input.' + currentFile.name.split('.').pop();
     const outName = 'output.' + codec.ext;
-    const data = await window._fetchFile(currentFile);
-    await ffmpeg.writeFile(inName, data);
+
+    // ffmpeg 0.11 API: FS-based
+    ffmpeg.FS('writeFile', inName, await window._fetchFile(currentFile));
 
     setProgress(5);
     document.getElementById('progress-label-text').textContent = 'Conversion en cours…';
 
-    // Build ffmpeg args
-    let args = ['-i', inName];
+    // Build args array
+    const args = ['-i', inName];
 
-    // Resolution
-    if (res && !codec.audioOnly && fmt !== 'gif') {
-      args.push('-vf', `scale='min(${res},iw)':-2`);
-    }
-
-    // FPS
-    if (fps && fmt !== 'gif') args.push('-r', fps);
-
-    // GIF special handling
     if (fmt === 'gif') {
       const scale = res ? `scale='min(${res},iw)':-1` : 'scale=iw:-1';
-      const fpsVal = fps || '10';
-      args.push(
-        '-vf', `${scale},split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
-        '-r', fpsVal
-      );
+      args.push('-vf', `${scale},split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`);
+      args.push('-r', fps || '10');
     } else if (codec.audioOnly) {
       args.push('-vn', '-acodec', codec.acodec, '-b:a', q.abr);
     } else {
+      if (res) args.push('-vf', `scale='min(${res},iw)':-2`);
+      if (fps) args.push('-r', fps);
       if (codec.vcodec) args.push('-vcodec', codec.vcodec);
       if (codec.acodec) args.push('-acodec', codec.acodec);
-      if (codec.vcodec === 'libx264') {
-        args.push('-crf', q.crf, '-preset', 'fast');
-      } else if (codec.vcodec === 'libvpx-vp9') {
-        args.push('-crf', q.crf, '-b:v', '0', '-b:a', q.abr);
-      }
-      if (codec.acodec && !['pcm_s16le','flac'].includes(codec.acodec)) {
-        args.push('-b:a', q.abr);
-      }
+      if (codec.vcodec === 'libx264') args.push('-crf', q.crf, '-preset', 'fast');
+      else if (codec.vcodec === 'libvpx-vp9') args.push('-crf', q.crf, '-b:v', '0');
+      if (codec.acodec && !['pcm_s16le','flac'].includes(codec.acodec)) args.push('-b:a', q.abr);
     }
-
     args.push(outName);
 
-    addLog('Commande: ffmpeg ' + args.join(' '));
-    await ffmpeg.exec(args);
+    addLog('ffmpeg ' + args.join(' '));
+    await ffmpeg.run(...args);   // 0.11 uses spread, not array
 
     setProgress(98);
     document.getElementById('progress-label-text').textContent = 'Finalisation…';
 
-    // Read output
-    const outData = await ffmpeg.readFile(outName);
+    const outData = ffmpeg.FS('readFile', outName);
     const blob = new Blob([outData.buffer], { type: getMimeType(fmt) });
     if (outputUrl) URL.revokeObjectURL(outputUrl);
     outputUrl = URL.createObjectURL(blob);
@@ -1186,7 +1158,6 @@ async function startConversion() {
     await new Promise(r => setTimeout(r, 300));
     hideProgress();
 
-    // Show result
     const baseName = currentFile.name.replace(/\.[^.]+$/, '');
     document.getElementById('dl-link').href = outputUrl;
     document.getElementById('dl-link').download = baseName + '_converti.' + codec.ext;
@@ -1196,9 +1167,9 @@ async function startConversion() {
     document.getElementById('result-section').classList.add('visible');
     document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-    // Cleanup ffmpeg
-    try { await ffmpeg.deleteFile(inName); } catch(e){}
-    try { await ffmpeg.deleteFile(outName); } catch(e){}
+    // Cleanup FS
+    try { ffmpeg.FS('unlink', inName); } catch(e){}
+    try { ffmpeg.FS('unlink', outName); } catch(e){}
 
   } catch(err) {
     hideProgress();
