@@ -959,9 +959,9 @@ async function initFFmpeg() {
     bar.style.width = '20%';
     status.textContent = 'Chargement de ffmpeg.wasm…';
 
-    // Load ffmpeg from CDN
-    const { FFmpeg } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js');
-    const { fetchFile, toBlobURL } = await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+    // Load ffmpeg from CDN (jsdelivr — CORS headers corrects)
+    const { FFmpeg } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js');
+    const { fetchFile, toBlobURL } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');
 
     window._fetchFile = fetchFile;
     bar.style.width = '50%';
@@ -971,7 +971,6 @@ async function initFFmpeg() {
 
     ffmpeg.on('log', ({ message }) => {
       addLog(message);
-      // Parse progress from ffmpeg output
       const timeMatch = message.match(/time=(\d+):(\d+):(\d+\.\d+)/);
       if (timeMatch && window._totalDuration) {
         const secs = parseInt(timeMatch[1])*3600 + parseInt(timeMatch[2])*60 + parseFloat(timeMatch[3]);
@@ -980,8 +979,8 @@ async function initFFmpeg() {
       }
     });
 
-    const baseURL = `https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm`;
-    const workerURL = `https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/worker.js`;
+    const baseURL = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm`;
+    const workerURL = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/esm/worker.js`;
     bar.style.width = '70%';
     status.textContent = 'Téléchargement du core wasm…';
 
